@@ -1,97 +1,177 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
-export default function LayoutLab() {
+export default function TipCalculator() {
+  const [bill, setBill] = useState('');
+  const [tipPercent, setTipPercent] = useState(10);
+  const [people, setPeople] = useState(1);
+
+  const amount = parseFloat(bill);
+  const validBill = bill.trim() !== '' && Number.isFinite(amount) && amount >= 0;
+
+  const tip = validBill ? amount * tipPercent / 100 : 0;
+  const total = validBill ? amount + tip : 0;
+  const perPerson = total / people;
+
   return (
-    <View style={styles.screen}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>My Dashboard</Text>
-        <Text style={styles.headerText}>Menu</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Tip Calculator</Text>
+
+      <Text style={styles.label}>Bill amount (K)</Text>
+      <TextInput
+        style={styles.input}
+        value={bill}
+        onChangeText={setBill}
+        keyboardType="numeric"
+        placeholder="Enter bill amount"
+      />
+
+      <Text style={styles.label}>Choose tip percentage</Text>
+      <View style={styles.row}>
+        {[5, 10, 15].map((percent) => (
+          <Pressable
+            key={percent}
+            style={[
+              styles.tipButton,
+              tipPercent === percent && styles.selected,
+            ]}
+            onPress={() => setTipPercent(percent)}
+          >
+            <Text
+              style={[
+                styles.buttonText,
+                tipPercent === percent && styles.selectedText,
+              ]}
+            >
+              {percent}%
+            </Text>
+          </Pressable>
+        ))}
       </View>
 
-      <View style={styles.stats}>
-        <View style={styles.stat}>
-          <Text style={styles.number}>120</Text>
-          <Text style={styles.caption}>Students</Text>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.stat}>
-          <Text style={styles.number}>8</Text>
-          <Text style={styles.caption}>Courses</Text>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.stat}>
-          <Text style={styles.number}>95%</Text>
-          <Text style={styles.caption}>Progress</Text>
-        </View>
+      <Text style={styles.label}>Number of people</Text>
+      <View style={styles.row}>
+        <Pressable
+          style={styles.peopleButton}
+          onPress={() => setPeople(Math.max(1, people - 1))}
+        >
+          <Text style={styles.buttonText}>−</Text>
+        </Pressable>
+
+        <Text style={styles.peopleCount}>{people}</Text>
+
+        <Pressable
+          style={styles.peopleButton}
+          onPress={() => setPeople(people + 1)}
+        >
+          <Text style={styles.buttonText}>+</Text>
+        </Pressable>
       </View>
 
-      <View style={styles.content}>
-        <Text>Dashboard content</Text>
-      </View>
-
-      <View style={styles.floatingButton}>
-        <Text style={styles.buttonText}>+</Text>
-      </View>
-    </View>
+      {validBill && (
+        <View style={styles.results}>
+          <Text style={styles.resultTitle}>Results</Text>
+          <Text>Tip: K{tip.toFixed(2)}</Text>
+          <Text>Total bill: K{total.toFixed(2)}</Text>
+          <Text style={styles.perPerson}>
+            Each person pays: K{perPerson.toFixed(2)}
+          </Text>
+        </View>
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
+  container: {
+    flexGrow: 1,
+    padding: 24,
+    justifyContent: 'center',
     backgroundColor: '#f0f2f5',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#1F3864',
-    padding: 20,
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#1F3864',
+    textAlign: 'center',
+    marginBottom: 28,
   },
-  headerText: {
-    color: '#ffffff',
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#cccccc',
+    borderRadius: 8,
+    padding: 14,
+    fontSize: 18,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    marginTop: 8,
+  },
+  tipButton: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#1F3864',
+  },
+  selected: {
+    backgroundColor: '#1F3864',
+  },
+  buttonText: {
+    color: '#1F3864',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  stats: {
-    flexDirection: 'row',
-    padding: 16,
-    backgroundColor: '#ffffff',
-  },
-  stat: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 8,
-  },
-  number: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  caption: {
-    fontSize: 12,
-    color: '#777777',
-  },
-  divider: {
-    width: 1,
-    backgroundColor: '#cccccc',
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  floatingButton: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#1F3864',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonText: {
+  selectedText: {
     color: '#ffffff',
-    fontSize: 28,
+  },
+  peopleButton: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#1F3864',
+  },
+  peopleCount: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    minWidth: 40,
+    textAlign: 'center',
+  },
+  results: {
+    backgroundColor: '#ffffff',
+    padding: 20,
+    borderRadius: 12,
+    marginTop: 28,
+    gap: 12,
+  },
+  resultTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1F3864',
+  },
+  perPerson: {
+    fontWeight: 'bold',
+    fontSize: 17,
   },
 });
