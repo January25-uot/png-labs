@@ -33,11 +33,20 @@ export default function TabLayout() {
           tabBarLabel: 'About',
         }}
       />
+
       <Tabs.Screen
   name="register"
   options={{
     title: 'Register',
     tabBarLabel: 'Register',
+  }}
+/>
+
+<Tabs.Screen
+  name="weather"
+  options={{
+    title: 'Weather',
+    tabBarLabel: 'Weather',
   }}
 />
     </Tabs>
