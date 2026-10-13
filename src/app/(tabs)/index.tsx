@@ -1,19 +1,27 @@
+
+
+import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   FlatList,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
-import ProvinceRow from '../components/ProvinceRow';
-import { PROVINCES } from '../data/provinces';
+import ProvinceRow from '../../components/ProvinceRow';
+import { PROVINCES } from '../../data/provinces';
+
 
 export default function ProvinceList() {
   const [search, setSearch] = useState('');
+  const router = useRouter();
 
   const filteredProvinces = PROVINCES.filter((province) =>
-    province.name.toLowerCase().includes(search.trim().toLowerCase())
+    province.name
+      .toLowerCase()
+      .includes(search.trim().toLowerCase())
   );
 
   return (
@@ -21,13 +29,19 @@ export default function ProvinceList() {
       style={styles.list}
       data={filteredProvinces}
       keyExtractor={(item) => item.id}
-      ItemSeparatorComponent={() => <View style={styles.separator} />}
+      ItemSeparatorComponent={() => (
+        <View style={styles.separator} />
+      )}
       ListHeaderComponent={
         <View>
-          <Text style={styles.title}>Papua New Guinea Provinces</Text>
+          <Text style={styles.title}>
+            Papua New Guinea Provinces
+          </Text>
+
           <Text style={styles.subtitle}>
             {filteredProvinces.length} provinces found
           </Text>
+
           <TextInput
             style={styles.input}
             value={search}
@@ -35,6 +49,8 @@ export default function ProvinceList() {
             placeholder="Search provinces..."
             autoCapitalize="none"
           />
+
+          <Link href="/about">About this app</Link>
         </View>
       }
       ListEmptyComponent={
@@ -44,7 +60,15 @@ export default function ProvinceList() {
             : 'No provinces match your search.'}
         </Text>
       }
-      renderItem={({ item }) => <ProvinceRow province={item} />}
+      renderItem={({ item }) => (
+        <Pressable
+          onPress={() =>
+  router.push(`/provinces/${item.id}` as any)
+}
+        >
+          <ProvinceRow province={item} />
+        </Pressable>
+      )}
     />
   );
 }
