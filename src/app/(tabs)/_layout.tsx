@@ -33,6 +33,13 @@ export default function TabLayout() {
           tabBarLabel: 'About',
         }}
       />
+      <Tabs.Screen
+  name="register"
+  options={{
+    title: 'Register',
+    tabBarLabel: 'Register',
+  }}
+/>
     </Tabs>
   );
 }
