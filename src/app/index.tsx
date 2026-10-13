@@ -1,177 +1,88 @@
 import { useState } from 'react';
 import {
-  Pressable,
-  ScrollView,
+  FlatList,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import ProvinceRow from '../components/ProvinceRow';
+import { PROVINCES } from '../data/provinces';
 
-export default function TipCalculator() {
-  const [bill, setBill] = useState('');
-  const [tipPercent, setTipPercent] = useState(10);
-  const [people, setPeople] = useState(1);
+export default function ProvinceList() {
+  const [search, setSearch] = useState('');
 
-  const amount = parseFloat(bill);
-  const validBill = bill.trim() !== '' && Number.isFinite(amount) && amount >= 0;
-
-  const tip = validBill ? amount * tipPercent / 100 : 0;
-  const total = validBill ? amount + tip : 0;
-  const perPerson = total / people;
+  const filteredProvinces = PROVINCES.filter((province) =>
+    province.name.toLowerCase().includes(search.trim().toLowerCase())
+  );
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Tip Calculator</Text>
-
-      <Text style={styles.label}>Bill amount (K)</Text>
-      <TextInput
-        style={styles.input}
-        value={bill}
-        onChangeText={setBill}
-        keyboardType="numeric"
-        placeholder="Enter bill amount"
-      />
-
-      <Text style={styles.label}>Choose tip percentage</Text>
-      <View style={styles.row}>
-        {[5, 10, 15].map((percent) => (
-          <Pressable
-            key={percent}
-            style={[
-              styles.tipButton,
-              tipPercent === percent && styles.selected,
-            ]}
-            onPress={() => setTipPercent(percent)}
-          >
-            <Text
-              style={[
-                styles.buttonText,
-                tipPercent === percent && styles.selectedText,
-              ]}
-            >
-              {percent}%
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-
-      <Text style={styles.label}>Number of people</Text>
-      <View style={styles.row}>
-        <Pressable
-          style={styles.peopleButton}
-          onPress={() => setPeople(Math.max(1, people - 1))}
-        >
-          <Text style={styles.buttonText}>−</Text>
-        </Pressable>
-
-        <Text style={styles.peopleCount}>{people}</Text>
-
-        <Pressable
-          style={styles.peopleButton}
-          onPress={() => setPeople(people + 1)}
-        >
-          <Text style={styles.buttonText}>+</Text>
-        </Pressable>
-      </View>
-
-      {validBill && (
-        <View style={styles.results}>
-          <Text style={styles.resultTitle}>Results</Text>
-          <Text>Tip: K{tip.toFixed(2)}</Text>
-          <Text>Total bill: K{total.toFixed(2)}</Text>
-          <Text style={styles.perPerson}>
-            Each person pays: K{perPerson.toFixed(2)}
+    <FlatList
+      style={styles.list}
+      data={filteredProvinces}
+      keyExtractor={(item) => item.id}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+      ListHeaderComponent={
+        <View>
+          <Text style={styles.title}>Papua New Guinea Provinces</Text>
+          <Text style={styles.subtitle}>
+            {filteredProvinces.length} provinces found
           </Text>
+          <TextInput
+            style={styles.input}
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Search provinces..."
+            autoCapitalize="none"
+          />
         </View>
-      )}
-    </ScrollView>
+      }
+      ListEmptyComponent={
+        <Text style={styles.empty}>
+          {PROVINCES.length === 0
+            ? 'No provinces available.'
+            : 'No provinces match your search.'}
+        </Text>
+      }
+      renderItem={({ item }) => <ProvinceRow province={item} />}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 24,
-    justifyContent: 'center',
+  list: {
+    flex: 1,
     backgroundColor: '#f0f2f5',
+    paddingHorizontal: 16,
   },
   title: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#1F3864',
-    textAlign: 'center',
-    marginBottom: 28,
+    marginTop: 20,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 16,
-    marginBottom: 8,
+  subtitle: {
+    fontSize: 14,
+    color: '#777777',
+    marginTop: 6,
+    marginBottom: 12,
   },
   input: {
     backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: '#cccccc',
     borderRadius: 8,
-    padding: 14,
-    fontSize: 18,
+    padding: 12,
+    marginBottom: 12,
+    fontSize: 16,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    marginTop: 8,
+  separator: {
+    height: 1,
+    backgroundColor: '#dddddd',
   },
-  tipButton: {
-    flex: 1,
-    padding: 14,
-    borderRadius: 8,
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#1F3864',
-  },
-  selected: {
-    backgroundColor: '#1F3864',
-  },
-  buttonText: {
-    color: '#1F3864',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  selectedText: {
-    color: '#ffffff',
-  },
-  peopleButton: {
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#1F3864',
-  },
-  peopleCount: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    minWidth: 40,
+  empty: {
     textAlign: 'center',
-  },
-  results: {
-    backgroundColor: '#ffffff',
-    padding: 20,
-    borderRadius: 12,
-    marginTop: 28,
-    gap: 12,
-  },
-  resultTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1F3864',
-  },
-  perPerson: {
-    fontWeight: 'bold',
-    fontSize: 17,
+    padding: 24,
+    color: '#777777',
   },
 });
